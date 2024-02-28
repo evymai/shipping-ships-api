@@ -1,6 +1,24 @@
 import sqlite3
 import json
 
+
+def add_dock(dock_data):
+    with sqlite3.connect("./shipping.db") as conn:
+        db_cursor = conn.cursor()
+
+        db_cursor.execute(
+            """
+            INSERT INTO Dock (name, capacity)
+            VALUES (?, ?)
+            """,
+            (dock_data["name"], dock_data["capacity"]),
+        )
+
+        conn.commit()
+
+        return db_cursor.lastrowid
+
+
 def update_dock(id, dock_data):
     with sqlite3.connect("./shipping.db") as conn:
         db_cursor = conn.cursor()
@@ -13,10 +31,11 @@ def update_dock(id, dock_data):
                     capacity = ?
             WHERE id = ?
             """,
-            (dock_data['location'], dock_data['capacity'], id)
+            (dock_data["location"], dock_data["capacity"], id),
         )
 
     return True if db_cursor.rowcount > 0 else False
+
 
 def delete_dock(pk):
     with sqlite3.connect("./shipping.db") as conn:
@@ -24,9 +43,11 @@ def delete_dock(pk):
         db_cursor = conn.cursor()
 
         # Write the SQL query to get the information you want
-        db_cursor.execute("""
+        db_cursor.execute(
+            """
         DELETE FROM Dock WHERE id = ?
-        """, (pk,)
+        """,
+            (pk,),
         )
         number_of_rows_deleted = db_cursor.rowcount
 
@@ -40,17 +61,19 @@ def list_docks():
         db_cursor = conn.cursor()
 
         # Write the SQL query to get the information you want
-        db_cursor.execute("""
+        db_cursor.execute(
+            """
         SELECT
             d.id,
             d.location,
             d.capacity
         FROM Dock d
-        """)
+        """
+        )
         query_results = db_cursor.fetchall()
 
         # Initialize an empty list and then add each dictionary to it
-        docks=[]
+        docks = []
         for row in query_results:
             docks.append(dict(row))
 
@@ -59,6 +82,7 @@ def list_docks():
 
     return serialized_docks
 
+
 def retrieve_dock(pk):
     # Open a connection to the database
     with sqlite3.connect("./shipping.db") as conn:
@@ -66,14 +90,17 @@ def retrieve_dock(pk):
         db_cursor = conn.cursor()
 
         # Write the SQL query to get the information you want
-        db_cursor.execute("""
+        db_cursor.execute(
+            """
         SELECT
             d.id,
             d.location,
             d.capacity
         FROM Dock d
         WHERE d.id = ?
-        """, (pk,))
+        """,
+            (pk,),
+        )
         query_results = db_cursor.fetchone()
 
         # Serialize Python list to JSON encoded string

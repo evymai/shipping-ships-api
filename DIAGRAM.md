@@ -1,0 +1,27 @@
+```mermaid
+sequenceDiagram
+    title Shipping Ships API
+
+     participant Client
+    participant Python
+    participant JSONServer
+    participant NSSHandler
+    participant ShipView
+    participant Database
+
+    Client->>Python:GET request to "/ships"
+    Python->>JSONServer:Run do_GET() method
+    JSONServer->>NSSHandler: run parse_url()
+    NSSHandler-->>JSONServer: Here is the url dictionary
+
+    note over NSSHandler: returns  url_dictionary with requested resources and pk if any
+    JSONServer->>ShipView: run list_ships()
+    ShipView->>Database: give me all of the ship data
+    note over ShipView: puts ship data into list and returns that list
+    Database-->>ShipView: here is the ship data
+    ShipView-->>JSONServer: Here's a list of ships
+    JSONServer->>NSSHandler: set_response_code() (sets the response to the list of ships)
+    NSSHandler-->>JSONServer: here's the response
+    JSONServer-->>Client: Here's all yer ships (in JSON format)
+
+```
